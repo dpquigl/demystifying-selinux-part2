@@ -1,0 +1,26 @@
+rpmbuild -ba eclipse-setools.spec 
+error: Failed build dependencies:
+	eclipse-pde >= 3.2 is needed by eclipse-setools-3.3.5.1-6.el6.x86_64
+	setools-libs-java >= 3.3.5 is needed by eclipse-setools-3.3.5.1-6.el6.x86_64
+
+rpmbuild -ba eclipse-slide.spec 
+error: Failed build dependencies:
+	javacc is needed by eclipse-slide-1.3.16-2.el6.noarch
+	eclipse-setools >= 3.3.2 is needed by eclipse-slide-1.3.16-2.el6.noarch
+	ganymed-ssh2 is needed by eclipse-slide-1.3.16-2.el6.noarch
+
+rpmbuild -ba ganymed-ssh2.spec 
+error: Failed build dependencies:
+	gcc-java >= 4.0.2 is needed by ganymed-ssh2-210-8.el6.x86_64
+	java-gcj-compat-devel >= 1.0.33 is needed by ganymed-ssh2-210-8.el6.x86_64
+
+
+yum install eclipse-pde setools-libs-java javacc gcc-java java-gcj-compat-devel
+rpmbuild -ba eclipse-setools.spec
+rpmbuild -ba janymed-ssh2.spec
+
+rpm -ihv ../RPMS/x86_64/eclipse-setools-3.3.5.1-6.el6.x86_64.rpm
+rpm -ihv ../RPMS/noarch/ganymed-ssh2-210-10.el6.noarch.rpm
+
+rpmbuild -ba eclipse-slide.spec
+rpm-ihv ../RPMS/noarch/eclipse-slide-1.3.16-2.el6.noarch.rpm
