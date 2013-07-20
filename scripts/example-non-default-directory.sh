@@ -5,29 +5,37 @@
 # Programmer:	Dave Quigley <dpquigl@davequigley.com>
 # Date:		2013-07-17
 # Purpose:	Provides a working example of a script to facilite a presentation involving the entry of shell commands.
-# Usage:	example.sh 2>&1 | grep -Ev "^read$"
-
-
-# The following commands setup a working environment, and as such are not intended as part of the presentation so will not be displayed.
-ORIG_DIR=`pwd`
+# Usage:	./example-non-default-port.sh 2>&1 | grep -Ev "^read$"
 
 # Begin displaying and stepping-thru scripted commands.
 trap read debug
 set -v
 
+# Create our new DocumentRoot for www.example-opt.com
+cp -R /var/www/ /opt
 
-# The following commands are part of the presentation, so will be stepped-thru and displayed.
-pwd
-cd /tmp
-pwd
-ls -l
+# Create our new index.html
+echo "Hello From www.example-opt.com" > /opt/www/html/index.html
 
+# Check out the label on /opt/www
+ls -Z /opt
 
-# Cease displaying and stepping-thru scripted commands.
+# Check out the label on /var/www
+ls -Z /var/
+
+# Set the label with chcon
+chcon -R -t httpd_sys_content_t /opt/www
+
+# Show a relabel wipes it away
+restorecon -Rvv /opt/www
+
+# Set the label the right way
+semanage fcontext -a -e /var/www /opt/www
+
+# Show a relabel gets the labels right this time
+restorecon -Rvv /opt/www
+
 set +v
 trap debug
-
-# The following commands restore the original environment.
-cd ${ORIG_DIR}
 
 exit 0

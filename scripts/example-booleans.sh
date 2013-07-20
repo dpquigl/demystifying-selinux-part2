@@ -5,29 +5,40 @@
 # Programmer:	Dave Quigley <dpquigl@davequigley.com>
 # Date:		2013-07-17
 # Purpose:	Provides a working example of a script to facilite a presentation involving the entry of shell commands.
-# Usage:	example.sh 2>&1 | grep -Ev "^read$"
+# Usage:	./example-booleans.sh 2>&1 | grep -Ev "^read$"
 
-
-# The following commands setup a working environment, and as such are not intended as part of the presentation so will not be displayed.
-ORIG_DIR=`pwd`
 
 # Begin displaying and stepping-thru scripted commands.
 trap read debug
 set -v
 
+# Create public_html in sedemo
+mkdir ~sedemo/public_html
 
-# The following commands are part of the presentation, so will be stepped-thru and displayed.
-pwd
-cd /tmp
-pwd
-ls -l
+# Create index.html in public_html
+echo "Hello From sedemo's home directory" > ~sedemo/public_html/index.html
 
+# Fixup DAC permissions
+chown -R sedemo:sedemo ~sedemo/public_html
+chmod o+rx /home/sedemo
+chmod o+rx ~sedemo/public_html
 
-# Cease displaying and stepping-thru scripted commands.
+# Look at label on the directory
+ls -Z ~sedemo | grep public_html
+
+# Restore the label on public_html
+restorecon -Rvv ~sedemo/public_html
+
+# Look for httpd booleans
+getsebool -a | grep httpd
+
+# Set appropriate booleans
+setsebool -P httpd_enable_homedirs=1 httpd_read_user_content=1
+
+# Show the booleans are set
+getsebool -a | grep httpd
+
 set +v
 trap debug
-
-# The following commands restore the original environment.
-cd ${ORIG_DIR}
 
 exit 0
